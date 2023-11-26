@@ -1,0 +1,28 @@
+{
+  "name": "gaugemeter.ts",
+  "version": "1.0.0",
+  "description": "GaugeMeter Typescript",
+  "author": {
+    "name": "Michael Wolf",
+    "email": "michael@mictronics.de",
+    "url": "https://www.mictronics.de"
+  },
+  "private": true,
+  "main": "",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "eslint --ext .ts src"
+  },
+  "repository": "",
+  "keywords": [],
+  "license": "GPL 3+",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0"
+  },
+  "engines": {
+    "node": ">18.0",
+    "npm": ">10.0",
+    "tsc": ">5.0"
+  }
+}

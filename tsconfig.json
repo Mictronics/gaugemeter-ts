@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "module": "es6",
+    "alwaysStrict": true
+  },
+  "include": ["src/**/*"],
+  "compileOnSave": true
+}
