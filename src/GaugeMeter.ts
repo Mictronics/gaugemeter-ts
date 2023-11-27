@@ -128,6 +128,11 @@ class GaugeMeter {
      * @returns HTML color string.
      */
     private getThemeColor(e: number): string {
+        // Return fix color if defined.
+        if (this.options.color !== '' && this.options.color !== null && this.options.color !== undefined) {
+            return this.options.color;
+        }
+        // Otherwise pick one from themes depending on gauge value.
         let t = '#f8590a';
         return (
             e || (e = 1e-14),
@@ -280,9 +285,6 @@ class GaugeMeter {
             const v = this.element.dataset[attr];
 
             switch (attr) {
-                case 'fill':
-                    this.options[attr] = v;
-                    break;
                 case 'size':
                 case 'width':
                 case 'animationstep':
@@ -310,7 +312,7 @@ class GaugeMeter {
 
     /**
      * The label below gauge.
-     * @param size The label size. 
+     * @param size The label size.
      */
     private createLabel(size: number) {
         if (this.element.getElementsByTagName('b').length === 0) {
@@ -354,6 +356,10 @@ class GaugeMeter {
      * Draws the gauge.
      */
     private drawGauge(val: number) {
+        if (this.options.animate_gauge_colors) {
+            // Set gauge color for each value change.
+            this.options.fgcolor = this.getThemeColor(val * 100);
+        }
         if (this.animationValue < 0) this.animationValue = 0;
         if (this.animationValue > 100) this.animationValue = 100;
         const lw = this.options.width < 1 || isNaN(this.options.width) ? this.options.size / 20 : this.options.width;
@@ -377,19 +383,24 @@ class GaugeMeter {
         this.canvasContext.lineWidth = lw;
         this.canvasContext.strokeStyle = this.options.fgcolor;
         this.canvasContext.stroke();
-        this.gaugeValue > this.animationValue &&
-            ((this.animationValue += this.maxAnimationStep),
-                window.requestAnimationFrame(() => {
-                    this.drawGauge(Math.min(this.animationValue, this.gaugeValue) / 100);
-                    const output = this.element.getElementsByTagName('output');
-                    if (output.length !== 0) {
-                        if (this.options.showvalue === true) {
-                            output[0].innerText = `${this.options.used}`;
-                        } else {
-                            output[0].innerText = `${this.animationValue}`;
-                        }
+        if (this.gaugeValue > this.animationValue) {
+            this.animationValue += this.maxAnimationStep;
+            window.requestAnimationFrame(() => {
+                this.drawGauge(Math.min(this.animationValue, this.gaugeValue) / 100);
+                if (this.options.animate_text_colors) {
+                    // Set text color for each value change.
+                    this.element.getElementsByTagName('span')[0].style.setProperty('color', this.options.fgcolor);
+                }
+                const output = this.element.getElementsByTagName('output');
+                if (output.length !== 0) {
+                    if (this.options.showvalue === true) {
+                        output[0].innerText = `${this.options.used}`;
+                    } else {
+                        output[0].innerText = `${this.animationValue}`;
                     }
-                }));
+                }
+            });
+        }
     }
 
     constructor(e: HTMLElement) {
@@ -450,14 +461,8 @@ class GaugeMeter {
             }
         }
 
+        // Pick initial gauge and text color.
         this.options.fgcolor = this.getThemeColor(this.gaugeValue);
-        if (this.options.color !== '' && this.options.color !== null && this.options.color !== undefined) {
-            this.options.fgcolor = this.options.color;
-        }
-
-        if (this.options.animate_gauge_colors === true) {
-            this.options.fgcolor = this.getThemeColor(this.gaugeValue);
-        }
         this.createSpanTag();
 
         if (this.options.style !== '' && this.options.style !== null && this.options.style !== undefined) {
@@ -492,8 +497,7 @@ class GaugeMeter {
             this.arcStart = 3.13;
             this.doublePi = 1 * Math.PI;
             this.halfPi = Math.PI / 0.996;
-        }
-        if ('Arch' === this.options.style) {
+        } else if ('Arch' === this.options.style) {
             this.arcEnd = 2.195 * Math.PI;
             this.arcStart = 655.99999;
             this.doublePi = 1.4 * Math.PI;

@@ -1,6 +1,9 @@
 "use strict";
 class GaugeMeter {
     getThemeColor(e) {
+        if (this.options.color !== '' && this.options.color !== null && this.options.color !== undefined) {
+            return this.options.color;
+        }
         let t = '#f8590a';
         return (e || (e = 1e-14),
             'Red-Gold-Green' === this.options.theme &&
@@ -146,9 +149,6 @@ class GaugeMeter {
             }
             const v = this.element.dataset[attr];
             switch (attr) {
-                case 'fill':
-                    this.options[attr] = v;
-                    break;
                 case 'size':
                 case 'width':
                 case 'animationstep':
@@ -207,6 +207,9 @@ class GaugeMeter {
         this.element.appendChild(span);
     }
     drawGauge(val) {
+        if (this.options.animate_gauge_colors) {
+            this.options.fgcolor = this.getThemeColor(val * 100);
+        }
         if (this.animationValue < 0)
             this.animationValue = 0;
         if (this.animationValue > 100)
@@ -233,20 +236,24 @@ class GaugeMeter {
         this.canvasContext.lineWidth = lw;
         this.canvasContext.strokeStyle = this.options.fgcolor;
         this.canvasContext.stroke();
-        this.gaugeValue > this.animationValue &&
-            ((this.animationValue += this.maxAnimationStep),
-                window.requestAnimationFrame(() => {
-                    this.drawGauge(Math.min(this.animationValue, this.gaugeValue) / 100);
-                    const output = this.element.getElementsByTagName('output');
-                    if (output.length !== 0) {
-                        if (this.options.showvalue === true) {
-                            output[0].innerText = `${this.options.used}`;
-                        }
-                        else {
-                            output[0].innerText = `${this.animationValue}`;
-                        }
+        if (this.gaugeValue > this.animationValue) {
+            this.animationValue += this.maxAnimationStep;
+            window.requestAnimationFrame(() => {
+                this.drawGauge(Math.min(this.animationValue, this.gaugeValue) / 100);
+                if (this.options.animate_text_colors) {
+                    this.element.getElementsByTagName('span')[0].style.setProperty('color', this.options.fgcolor);
+                }
+                const output = this.element.getElementsByTagName('output');
+                if (output.length !== 0) {
+                    if (this.options.showvalue === true) {
+                        output[0].innerText = `${this.options.used}`;
                     }
-                }));
+                    else {
+                        output[0].innerText = `${this.animationValue}`;
+                    }
+                }
+            });
+        }
     }
     constructor(e) {
         this.options = Object.seal({
@@ -357,12 +364,6 @@ class GaugeMeter {
             }
         }
         this.options.fgcolor = this.getThemeColor(this.gaugeValue);
-        if (this.options.color !== '' && this.options.color !== null && this.options.color !== undefined) {
-            this.options.fgcolor = this.options.color;
-        }
-        if (this.options.animate_gauge_colors === true) {
-            this.options.fgcolor = this.getThemeColor(this.gaugeValue);
-        }
         this.createSpanTag();
         if (this.options.style !== '' && this.options.style !== null && this.options.style !== undefined) {
             this.createLabel(this.options.size / 13);
@@ -394,7 +395,7 @@ class GaugeMeter {
             this.doublePi = 1 * Math.PI;
             this.halfPi = Math.PI / 0.996;
         }
-        if ('Arch' === this.options.style) {
+        else if ('Arch' === this.options.style) {
             this.arcEnd = 2.195 * Math.PI;
             this.arcStart = 655.99999;
             this.doublePi = 1.4 * Math.PI;
