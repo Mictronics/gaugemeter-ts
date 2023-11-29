@@ -14,7 +14,7 @@ An elegant and dynamic animated graphical gauge meter built Typescript. GaugeMet
 - Update via function call.
 - Backward compatible with GaugeMeter jQuery plugin. Equal CSS and HTML code. Javascript requires minor code changes.
 
-[See demo page for details](https://www.mictronics.de/gaugemeter/)
+[See demo page for details](https://www.mictronics.de/gaugemeter/index.html)
 
 #### Requirements
 
