@@ -425,10 +425,8 @@ class GaugeMeter {
             let u = this.options.used;
             let t = this.options.total;
             if (Number.isInteger(this.options.min)) {
-                if (this.options.min < 0) {
-                    t -= this.options.min;
-                    u -= this.options.min;
-                }
+                t -= this.options.min;
+                u -= this.options.min;
             }
             this.gaugeValue = u / (t / 100);
         } else {
